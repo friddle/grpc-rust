@@ -6,6 +6,7 @@ use bytes::Buf;
 use bytes::Bytes;
 use httpbis::BufGetBytes;
 use httpbis::BytesDeque;
+use crate::chars::bytes_debug_output;
 
 #[derive(Default, Debug)]
 pub(crate) struct GrpcFrameParser {

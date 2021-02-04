@@ -15,6 +15,7 @@ use futures::channel::mpsc;
 use crate::proto::grpc_frame_parser::GrpcFrameParser;
 use crate::Metadata;
 use crate::ServerRequestStream;
+use crate::chars::bytes_debug_output;
 
 pub(crate) trait ServerRequestStreamHandlerUntyped: Send + 'static {
     fn grpc_message(&mut self, message: Bytes, frame_size: u32) -> result::Result<()>;
@@ -77,8 +78,9 @@ impl<H: ServerRequestStreamHandlerUntyped> httpbis::ServerRequestStreamHandler
     for ServerStreamStreamHandlerUntypedHandler<H>
 {
     fn data_frame(&mut self, data: Bytes, end_stream: bool) -> httpbis::Result<()> {
+        println!("--------------data_frame---------:is end_Stream:{}",end_stream);
+        bytes_debug_output(&data);
         self.buf.enqueue(data);
-
         self.process_buf()?;
 
         if end_stream {
@@ -88,10 +90,12 @@ impl<H: ServerRequestStreamHandlerUntyped> httpbis::ServerRequestStreamHandler
             return Ok(());
         }
 
+        println!("--------------data_frame-finish---------\r\r");
         Ok(())
     }
 
     fn trailers(&mut self, trailers: Headers) -> httpbis::Result<()> {
+        println!("--------------trailers---------:trailers:{:?}",trailers);
         // there are no trailers in gRPC request
         drop(trailers);
 
@@ -104,6 +108,7 @@ impl<H: ServerRequestStreamHandlerUntyped> httpbis::ServerRequestStreamHandler
     }
 
     fn error(&mut self, error: httpbis::Error) -> httpbis::Result<()> {
+        println!("--------------error---------:error:{:?}",error);
         self.handler.error(error.into())?;
         Ok(())
     }

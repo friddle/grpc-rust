@@ -14,6 +14,7 @@ use httpbis::DataOrTrailers;
 use httpbis::HttpStreamAfterHeaders;
 use std::pin::Pin;
 use std::task::Poll;
+use crate::chars::bytes_debug_output;
 
 pub const GRPC_HEADER_LEN: usize = 5;
 
@@ -84,6 +85,8 @@ impl Stream for GrpcFrameFromHttpFramesStreamRequest {
             self.parsed_frames.extend(parsed_frames);
 
             if let Some(frame) = self.parsed_frames.pop_front() {
+                println!("byte output in grpc frame");
+                bytes_debug_output(&frame);
                 return Poll::Ready(Some(Ok(frame)));
             }
 

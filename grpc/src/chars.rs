@@ -62,3 +62,11 @@ impl From<String> for Chars {
         Chars(Bytes::from(s))
     }
 }
+
+pub(crate) fn bytes_debug_output(bytes:&Bytes){
+    unsafe{
+        //println!("bytes message output:{}",std::str::from_utf8_unchecked(bytes));
+        let data=bytes.to_vec();
+        println!("bytes message output:{:#04X?}",bytes);
+    }
+}

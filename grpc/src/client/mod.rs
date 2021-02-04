@@ -249,6 +249,8 @@ impl Client {
             .client
             .start_request(headers, req_bytes, None, end_stream);
 
+
+
         let http_future = http_future.map_err(error::Error::from);
 
         let req_marshaller = method.req_marshaller.clone();

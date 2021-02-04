@@ -12,6 +12,7 @@ use crate::server::types::ServerTypes;
 use futures::task::Context;
 use httpbis;
 use std::task::Poll;
+use crate::chars::bytes_debug_output;
 
 pub trait MessageToBeSerialized {
     fn size_estimate(&self) -> result::Result<u32>;
@@ -60,7 +61,10 @@ impl<T: Types> SinkCommonUntyped<T> {
         write_grpc_frame_cb(&mut data, size_estimate, |data| {
             message.write(size_estimate, data)
         })?;
-        self.http.send_data(Bytes::from(data))?;
+        let bytes=Bytes::from(data);
+        println!("---------in-resp-send---bytes-----:");
+        bytes_debug_output(&bytes);
+        self.http.send_data(bytes)?;
         Ok(())
     }
 }

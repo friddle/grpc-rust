@@ -25,6 +25,7 @@ use httpbis::DataOrTrailers;
 use httpbis::HttpStreamAfterHeaders;
 use std::pin::Pin;
 use std::task::Poll;
+use crate::chars::bytes_debug_output;
 
 fn init_headers_to_metadata(headers: Headers) -> result::Result<Metadata> {
     if headers.get_opt(":status") != Some("200") {
@@ -85,6 +86,8 @@ impl Stream for GrpcFrameFromHttpFramesStreamResponse {
             self.parsed_frames.extend(frames);
 
             if let Some(frame) = self.parsed_frames.pop_front() {
+                println!("receive---pop---bytes----");
+                bytes_debug_output(&frame);
                 return Poll::Ready(Some(Ok(ItemOrMetadata::Item(frame))));
             }
 
@@ -93,6 +96,7 @@ impl Stream for GrpcFrameFromHttpFramesStreamResponse {
                     Poll::Pending => return Poll::Pending,
                     Poll::Ready(part_opt) => part_opt,
                 };
+
             let part = match part_opt {
                 None => {
                     self.buf.check_empty()?;
@@ -106,10 +110,12 @@ impl Stream for GrpcFrameFromHttpFramesStreamResponse {
                     self.buf.check_empty()?;
                     let grpc_status = headers.get_opt_parse(HEADER_GRPC_STATUS);
                     if grpc_status == Some(GrpcStatus::Ok as i32) {
+                        println!("-------req----receiver-----trails------");
                         return Poll::Ready(Some(Ok(ItemOrMetadata::TrailingMetadata(
                             Metadata::from_headers(headers)?,
                         ))));
                     } else {
+                        println!("--------- req--receiver error--------");
                         return Poll::Ready(Some(Err(
                             if let Some(message) = headers.get_opt(HEADER_GRPC_MESSAGE) {
                                 Error::GrpcMessage(GrpcMessageError {

@@ -42,9 +42,16 @@ impl From<httpbis::SendError> for Error {
     }
 }
 
+
 impl From<httpbis::StreamDead> for Error {
     fn from(e: httpbis::StreamDead) -> Self {
         Error::Http(httpbis::Error::from(e))
+    }
+}
+
+impl From<common::error::Error> for Error{
+    fn from(e:common::error::Error)->Self{
+        Error::Other("fucking dont know");
     }
 }
 

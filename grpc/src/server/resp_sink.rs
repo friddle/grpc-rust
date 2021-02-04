@@ -34,6 +34,7 @@ impl<Resp: Send> ServerResponseSink<Resp> {
     ///
     /// This function returns error if metadata is already sent.
     pub fn send_metadata(&mut self, metadata: Metadata) -> result::Result<()> {
+        println!("---------in-resp-send-metadata-----:");
         self.common.sink.send_metadata(metadata)?;
         Ok(())
     }
@@ -52,6 +53,7 @@ impl<Resp: Send> ServerResponseSink<Resp> {
     ///
     /// This function must be called after data is sent, otherwise the response stream is reset.
     pub fn send_trailers(&mut self, metadata: Metadata) -> result::Result<()> {
+        println!("---------in-resp-check send trail------- trailers:{:?}",&metadata);
         self.common.sink.send_trailers(metadata)?;
         Ok(())
     }
